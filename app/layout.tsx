@@ -40,6 +40,14 @@ export default function RootLayout({
           footerActionLink: 'text-primary hover:text-primary/90',
         }
       }}
+      localization={{
+        signIn: {
+          start: {
+            title: 'Quantix AI',
+            subtitle: 'Welcome back! Please enter your details.',
+          }
+        }
+      }}
     >
       <html lang="en" suppressHydrationWarning>
         <body className={`${inter.variable} font-sans antialiased bg-background text-foreground min-h-screen flex flex-col`}>

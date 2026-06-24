@@ -1,4 +1,7 @@
 "use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useApi } from "@/hooks/useApi";
 import { Search, ChevronRight, Activity, Zap, TrendingUp, ShieldCheck } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,7 +9,27 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 
 export default function Home() {
-  const popularTickers = ["NVDA", "AAPL", "MSFT", "AMZN", "TSLA"];
+  const [popularTickers, setPopularTickers] = useState<string[]>(["NVDA", "AAPL", "MSFT", "AMZN", "TSLA"]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const { getTrendingStocks } = useApi();
+
+  useEffect(() => {
+    getTrendingStocks()
+      .then((res) => {
+        if (res?.data?.trending && res.data.trending.length > 0) {
+          setPopularTickers(res.data.trending.slice(0, 5));
+        }
+      })
+      .catch((err) => console.error("Failed to load trending stocks", err));
+  }, []);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/stock/${searchQuery.trim().toUpperCase()}`);
+    }
+  };
 
   return (
     <div className="container mx-auto px-4 py-12 lg:py-20">
@@ -29,23 +52,30 @@ export default function Home() {
             Quantix AI analyzes market data, news, sentiment, and fundamentals to deliver actionable investment insights you can trust.
           </p>
 
-          <div className="flex w-full max-w-md items-center space-x-2 mt-4 relative">
+          <form onSubmit={handleSearch} className="flex w-full max-w-md items-center space-x-2 mt-4 relative">
             <Search className="absolute left-4 w-5 h-5 text-muted-foreground" />
             <Input 
               type="text" 
               placeholder="Search any company or ticker..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 h-14 rounded-xl border-border bg-card shadow-sm text-base"
             />
-            <Button size="icon" className="absolute right-2 h-10 w-10 bg-foreground hover:bg-foreground/90 text-background rounded-lg">
+            <Button type="submit" size="icon" className="absolute right-2 h-10 w-10 bg-foreground hover:bg-foreground/90 text-background rounded-lg">
               <Search className="w-5 h-5" />
             </Button>
-          </div>
+          </form>
 
           <div className="flex items-center gap-3 mt-4">
-            <span className="text-sm font-medium text-muted-foreground">Popular:</span>
+            <span className="text-sm font-medium text-muted-foreground">Trending:</span>
             <div className="flex gap-2 flex-wrap">
               {popularTickers.map((ticker) => (
-                <Badge key={ticker} variant="secondary" className="hover:bg-muted cursor-pointer transition-colors px-3 py-1 text-xs">
+                <Badge 
+                  key={ticker} 
+                  variant="secondary" 
+                  onClick={() => router.push(`/stock/${ticker}`)}
+                  className="hover:bg-muted cursor-pointer transition-colors px-3 py-1 text-xs"
+                >
                   {ticker}
                 </Badge>
               ))}

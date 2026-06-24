@@ -50,6 +50,11 @@ export function useApi() {
     return data;
   };
 
+  const getTrendingStocks = async () => {
+    const { data } = await apiClient.get('/market/trending');
+    return data;
+  };
+
   const getCompareStocks = async (tickers: string[]) => {
     const { data } = await apiClient.get(`/compare?tickers=${tickers.join(',')}`);
     return data;
@@ -66,6 +71,7 @@ export function useApi() {
     getStockData,
     getResearchProgress,
     getMarketMood,
+    getTrendingStocks,
     getCompareStocks,
     sendChatMessage,
   };

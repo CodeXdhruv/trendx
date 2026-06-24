@@ -58,9 +58,21 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <div className="relative hidden lg:flex items-center">
+          <form 
+            onSubmit={(e) => {
+              e.preventDefault();
+              const formData = new FormData(e.currentTarget);
+              const query = formData.get('search');
+              if (query) {
+                // If router is not available here, we could use standard window.location, but we can import useRouter
+                window.location.href = `/stock/${query.toString().trim().toUpperCase()}`;
+              }
+            }}
+            className="relative hidden lg:flex items-center"
+          >
             <Search className="absolute left-3 w-4 h-4 text-muted-foreground" />
             <Input 
+              name="search"
               placeholder="Search company or ticker..." 
               className="w-[280px] pl-9 bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary rounded-lg h-9"
             />
@@ -69,7 +81,7 @@ export default function Navbar() {
                 <Command className="w-3 h-3"/> K
               </kbd>
             </div>
-          </div>
+          </form>
 
           <div className="flex items-center gap-3">
             <button 

@@ -119,3 +119,14 @@
     @apply font-sans;
   }
 }
+
+/* Hide Clerk Watermarks and Development Badges */
+.cl-internal-b3al4t,
+.cl-internal-1hp5nqm,
+.cl-internal-11wntu2 {
+    display: none !important;
+}
+
+div[class^="cl-internal-"] > div[class^="cl-internal-"]:last-child {
+    display: none !important;
+}
