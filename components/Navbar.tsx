@@ -6,11 +6,12 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { usePathname } from 'next/navigation';
 
 import { useTheme } from 'next-themes';
-import { UserButton, SignInButton, SignedIn, SignedOut } from '@clerk/nextjs';
+import { UserButton, SignInButton, SignUpButton, useAuth } from '@clerk/nextjs';
 
 export default function Navbar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
+  const { isLoaded, userId } = useAuth();
   const links = ['Research', 'Watchlist', 'Compare', 'Insights', 'Alerts', 'Portfolio'];
 
   return (
@@ -77,16 +78,27 @@ export default function Navbar() {
             </button>
             
             <div className="flex items-center gap-2 pl-2 border-l border-border">
-              <SignedIn>
+              {isLoaded && userId ? (
                 <UserButton afterSignOutUrl="/" />
-              </SignedIn>
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <button className="text-sm font-medium bg-foreground text-background px-4 py-1.5 rounded-lg">
-                    Sign In
-                  </button>
-                </SignInButton>
-              </SignedOut>
+              ) : isLoaded && !userId ? (
+                <div className="flex items-center gap-2">
+                  <SignInButton mode="modal">
+                    <button className="text-sm font-medium hover:text-primary transition-colors px-3 py-1.5">
+                      Log in
+                    </button>
+                  </SignInButton>
+                  <SignUpButton mode="modal">
+                    <button className="text-sm font-medium bg-primary text-primary-foreground px-4 py-1.5 rounded-lg hover:bg-primary/90 transition-colors">
+                      Sign Up
+                    </button>
+                  </SignUpButton>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <div className="w-16 h-8 rounded bg-muted animate-pulse" />
+                  <div className="w-20 h-8 rounded bg-muted animate-pulse" />
+                </div>
+              )}
             </div>
           </div>
         </div>

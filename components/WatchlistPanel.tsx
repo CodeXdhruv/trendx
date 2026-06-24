@@ -1,12 +1,13 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getWatchlist } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useApi } from "@/hooks/useApi";
 
 export default function WatchlistPanel() {
   const [watchlist, setWatchlist] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const { getWatchlist } = useApi();
 
   useEffect(() => {
     getWatchlist()
