@@ -65,6 +65,52 @@ export function useApi() {
     return data;
   };
 
+  const startResearch = async (ticker: string, onProgress?: (data: any) => void) => {
+    const token = await getToken();
+    const res = await fetch(`${BACKEND_URL}/research/start/stream`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({ ticker })
+    });
+    
+    if (!res.body) throw new Error("No readable stream");
+    
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let finalData = null;
+    let buffer = '';
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop() || '';
+      
+      for (const line of lines) {
+        if (line.startsWith('data: ')) {
+          try {
+            const parsed = JSON.parse(line.slice(6));
+            if (parsed.type === 'final') {
+              finalData = parsed.output;
+            }
+            if (onProgress) {
+              onProgress(parsed);
+            }
+          } catch (e) {
+            console.error("Error parsing SSE line", e);
+          }
+        }
+      }
+    }
+    
+    return { data: finalData };
+  };
+
   return {
     apiClient,
     getWatchlist,
@@ -74,5 +120,6 @@ export function useApi() {
     getTrendingStocks,
     getCompareStocks,
     sendChatMessage,
+    startResearch,
   };
 }
