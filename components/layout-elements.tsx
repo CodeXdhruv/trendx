@@ -1,20 +1,25 @@
 "use client";
+import { Rocket } from "lucide-react";
+
+import * as React from "react";
 import Link from 'next/link';
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui";
+import { Input } from "@/components/ui";
 import { Search, Sun, Moon, Bell, Command } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { usePathname } from 'next/navigation';
-
-import { useTheme } from 'next-themes';
+import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from "next-themes";
 import { UserButton, SignInButton, SignUpButton, useAuth } from '@clerk/nextjs';
+import { motion, AnimatePresence } from 'framer-motion';
+import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
+import { useTheme } from 'next-themes';
 
-export default function Navbar() {
+
+export function Navbar() {
   const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const { isLoaded, userId } = useAuth();
   const [mounted, setMounted] = useState(false);
-  const links = ['Research', 'Watchlist', 'Compare', 'Insights', 'Alerts', 'Portfolio'];
+  const links = ['Research', 'Watchlist', 'Compare', 'Insights', 'Alerts'];
 
   useEffect(() => {
     setMounted(true);
@@ -97,7 +102,7 @@ export default function Navbar() {
             
             <div className="flex items-center gap-2 pl-2 border-l border-border">
               {isLoaded && userId ? (
-                <UserButton afterSignOutUrl="/" />
+                <UserButton />
               ) : isLoaded && !userId ? (
                 <div className="flex items-center gap-2">
                   <SignInButton mode="modal">
@@ -124,3 +129,30 @@ export default function Navbar() {
     </nav>
   );
 }
+
+export function Footer() {
+  return null;
+}
+
+export function PageTransition({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  return (
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={pathname}
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: 20, opacity: 0 }}
+        transition={{ duration: 0.4, ease: "easeOut" }}
+      >
+        {children}
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+  return <NextThemesProvider {...props}>{children}</NextThemesProvider>;
+}
+
