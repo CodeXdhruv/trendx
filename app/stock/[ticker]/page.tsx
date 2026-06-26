@@ -64,6 +64,7 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
         roe: { label: 'ROE', value: 'N/A', changePercent: 0, trend: 'neutral' },
       },
       agentOutputs: {},
+      companyNews: [],
     };
 
     getStockData(ticker)
@@ -90,6 +91,7 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
                grossMargin: { label: 'Gross Margin', value: res.data.financials.grossMargins ? `${(res.data.financials.grossMargins * 100).toFixed(1)}%` : 'N/A', changePercent: 0, trend: 'neutral' },
                roe: { label: 'ROE', value: res.data.financials.returnOnEquity ? `${(res.data.financials.returnOnEquity * 100).toFixed(1)}%` : 'N/A', changePercent: 0, trend: 'neutral' }
             } : baseData.financials,
+            companyNews: res.data.news || [],
           });
           
           startResearch(ticker, (progressData) => {
@@ -484,6 +486,29 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
                              <span>{event}</span>
                            </div>
                          ))}
+                         
+                         {data.companyNews && data.companyNews.length > 0 && (
+                           <>
+                             <h4 className="text-sm font-semibold mt-6 mb-3">Recent News & Articles</h4>
+                             <div className="space-y-3">
+                               {data.companyNews.slice(0, 3).map((article: any, i: number) => (
+                                 <a key={i} href={article.url} target="_blank" rel="noopener noreferrer" className="block p-4 border border-border rounded-xl hover:bg-muted/30 transition-colors group">
+                                   <div className="flex justify-between items-start gap-4">
+                                     <div>
+                                       <h5 className="font-semibold text-sm group-hover:text-primary transition-colors line-clamp-2 mb-1">{article.title}</h5>
+                                       {article.description && <p className="text-xs text-muted-foreground line-clamp-2 mb-2">{article.description}</p>}
+                                       <div className="flex items-center gap-2 text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
+                                         <span>{article.source}</span>
+                                         <span>•</span>
+                                         <span>{new Date(article.publishedAt).toLocaleDateString()}</span>
+                                       </div>
+                                     </div>
+                                   </div>
+                                 </a>
+                               ))}
+                             </div>
+                           </>
+                         )}
                        </div>
                      )
                    })()
