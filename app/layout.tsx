@@ -9,7 +9,7 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "Quantix AI - AI-Powered Investment Research",
-  description: "Clear Insights. Smarter Investments.",
+  description: "Smarter research. Better investments.",
 };
 
 import { ClerkProvider } from '@clerk/nextjs'
@@ -28,12 +28,12 @@ export default function RootLayout({
       appearance={{
 
         variables: {
-          colorPrimary: '#E8002D',
-          colorBackground: '#0a0a0a',
+          colorPrimary: '#A855F7',
+          colorBackground: '#0D0D12',
         },
         elements: {
           card: 'bg-card border border-border shadow-sm rounded-2xl',
-          formButtonPrimary: 'bg-primary hover:bg-primary/90 text-primary-foreground',
+          formButtonPrimary: 'bg-primary hover:bg-primary-hover text-primary-foreground',
           socialButtonsBlockButton: 'border border-border bg-background hover:bg-muted text-foreground',
           socialButtonsBlockButtonText: 'font-semibold',
           formFieldInput: 'bg-muted border-none focus-visible:ring-1 focus-visible:ring-primary rounded-lg',

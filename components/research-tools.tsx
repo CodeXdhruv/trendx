@@ -63,7 +63,7 @@ export function AIAnalystChat({ onClose }: { onClose: () => void }) {
       <div className="p-4 flex justify-end">
         <div 
           onClick={() => setInputValue("What's driving NVIDIA's growth?")}
-          className="bg-primary cursor-pointer hover:bg-primary/90 text-primary-foreground text-sm px-4 py-2 rounded-2xl rounded-tr-sm inline-block shadow-sm"
+          className="bg-primary cursor-pointer hover:bg-primary-hover text-primary-foreground text-sm px-4 py-2 rounded-2xl rounded-tr-sm inline-block shadow-sm"
         >
           What's driving NVIDIA's growth?
         </div>
