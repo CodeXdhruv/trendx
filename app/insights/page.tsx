@@ -88,7 +88,7 @@ const EmptyState = () => (
 function Header({ onRefresh, isFetching }: { onRefresh: () => void, isFetching: boolean }) {
   return (
     <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-      <div>
+      <div className="text-center md:text-left">
         <h1 className="text-3xl font-bold tracking-tight mb-1">Market Intelligence</h1>
         <p className="text-muted-foreground">Real-time market insights and sector performance</p>
       </div>

@@ -66,7 +66,7 @@ export default function Home() {
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex flex-col gap-6"
+          className="flex flex-col gap-6 items-center text-center lg:items-start lg:text-left"
         >
           <h1 className="text-[48px] lg:text-[56px] font-bold leading-tight tracking-tight text-foreground">
             Smarter research.<br/>
@@ -76,7 +76,7 @@ export default function Home() {
             All agents analyze market data, news, sentiment and fundamentals to deliver actionable insights you can trust.
           </p>
 
-          <form onSubmit={handleSearch} className="flex w-full max-w-md items-center mt-4 relative">
+          <form onSubmit={handleSearch} className="flex w-full max-w-md items-center mt-4 relative mx-auto lg:mx-0">
             <Search className="absolute left-4 w-5 h-5 text-muted-foreground pointer-events-none" />
             <Input 
               type="text" 
@@ -90,15 +90,15 @@ export default function Home() {
             </Button>
           </form>
 
-          <div className="flex items-center gap-3 mt-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mt-4">
             <span className="text-sm font-medium text-muted-foreground">Trending:</span>
-            <div className="flex gap-2 flex-wrap">
-              {popularTickers.map((ticker) => (
+            <div className="flex gap-2 flex-wrap justify-center lg:justify-start">
+              {popularTickers.map((ticker, index) => (
                 <Badge 
                   key={ticker} 
                   variant="secondary" 
                   onClick={() => router.push(`/stock/${ticker}`)}
-                  className="hover:bg-muted cursor-pointer transition-colors px-2.5 py-1 text-xs flex items-center gap-1.5"
+                  className={`hover:bg-muted cursor-pointer transition-colors px-2.5 py-1 text-xs items-center gap-1.5 ${index === 4 ? 'hidden sm:flex' : 'flex'}`}
                 >
                   <img src={getTickerIconUrl(ticker)} alt="" className="w-4 h-4 rounded-sm bg-white shadow-sm" onError={(e) => (e.currentTarget.style.display = 'none')} />
                   {ticker}
@@ -113,7 +113,7 @@ export default function Home() {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="relative h-full flex items-start justify-center lg:justify-end lg:pr-12 w-full lg:pt-2"
+          className="relative h-full hidden lg:flex items-start justify-center lg:justify-end lg:pr-12 w-full lg:pt-2"
         >
           <div className="w-full max-w-lg lg:scale-105 origin-right">
             <AnimatedResearchCard />
@@ -207,7 +207,7 @@ export default function Home() {
           )})}
 
           {/* Fear & Greed */}
-          <div className="w-full bg-card border border-border rounded-xl p-5 flex flex-col justify-between items-center relative overflow-hidden">
+          <div className="hidden md:flex w-full bg-card border border-border rounded-xl p-5 flex-col justify-between items-center relative overflow-hidden">
             <div className="text-xs font-semibold text-muted-foreground mb-2 w-full text-left">Fear & Greed Index</div>
             <div className="relative flex items-center justify-center w-20 h-20 mt-2">
                <svg viewBox="0 0 36 36" className="w-20 h-20 transform -rotate-90">

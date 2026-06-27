@@ -12,6 +12,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
+import { Menu, X } from 'lucide-react';
 
 
 export function Navbar() {
@@ -19,9 +20,15 @@ export function Navbar() {
   const { theme, setTheme } = useTheme();
   const { isLoaded, userId } = useAuth();
   const [mounted, setMounted] = useState(false);
-  const links = ['Research', 'Watchlist', 'Compare', 'Insights', 'Alerts'];
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const links = ['Home', 'Watchlist', 'Compare', 'Insights', 'Alerts'];
 
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Close mobile menu when route changes
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     setMounted(true);
@@ -47,15 +54,22 @@ export function Navbar() {
               <img src="/logo-light.png" alt="StockForge Logo" className="w-8 h-8 dark:hidden object-contain" />
               <img src="/logo-dark.png" alt="StockForge Logo" className="hidden dark:block w-8 h-8 object-contain" />
             </div>
-            <span className="font-bold text-xl tracking-tight">StockForge</span>
+            <span className="font-bold text-xl tracking-tight hidden sm:block">StockForge</span>
           </Link>
           
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden lg:flex items-center gap-1">
             {links.map((link) => {
-              const href = link === 'Research' ? '/' : `/${link.toLowerCase()}`;
+              let displayLabel = link;
+              const href = link === 'Home' ? '/' : `/${link.toLowerCase()}`;
               let isActive = false;
-              if (link === 'Research') {
+              if (link === 'Home') {
                 isActive = pathname === '/' || pathname === '/research' || pathname.startsWith('/stock/');
+                if (pathname.startsWith('/stock/')) {
+                  const ticker = pathname.split('/')[2];
+                  if (ticker) {
+                    displayLabel = `Researching: ${ticker.toUpperCase()}`;
+                  }
+                }
               } else {
                 isActive = pathname.startsWith(href);
               }
@@ -66,7 +80,7 @@ export function Navbar() {
                   href={href}
                   className={`px-3 py-2 text-sm font-medium transition-colors relative ${isActive ? 'text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
                 >
-                  {link}
+                  {displayLabel}
                   {isActive && (
                     <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t-full" />
                   )}
@@ -138,9 +152,77 @@ export function Navbar() {
                 </div>
               )}
             </div>
+            
+            {/* Mobile Menu Toggle */}
+            <button 
+              className="lg:hidden p-2 text-muted-foreground hover:text-foreground"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu Dropdown */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="lg:hidden border-b border-border bg-background"
+          >
+            <div className="container mx-auto px-4 py-4 flex flex-col gap-4">
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  const query = formData.get('search');
+                  if (query) {
+                    window.location.href = `/stock/${query.toString().trim().toUpperCase()}`;
+                  }
+                }}
+                className="relative flex items-center w-full mb-2"
+              >
+                <Search className="absolute left-3 w-4 h-4 text-muted-foreground" />
+                <Input 
+                  name="search"
+                  placeholder="Search company or ticker..." 
+                  className="w-full pl-9 bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary rounded-lg h-10"
+                />
+              </form>
+              
+              {links.map((link) => {
+                let displayLabel = link;
+                const href = link === 'Home' ? '/' : `/${link.toLowerCase()}`;
+                let isActive = false;
+                if (link === 'Home') {
+                  isActive = pathname === '/' || pathname === '/research' || pathname.startsWith('/stock/');
+                  if (pathname.startsWith('/stock/')) {
+                    const ticker = pathname.split('/')[2];
+                    if (ticker) {
+                      displayLabel = `Researching: ${ticker.toUpperCase()}`;
+                    }
+                  }
+                } else {
+                  isActive = pathname.startsWith(href);
+                }
+                
+                return (
+                  <Link
+                    key={link}
+                    href={href}
+                    className={`px-4 py-3 rounded-lg text-sm font-medium transition-colors ${isActive ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                  >
+                    {displayLabel}
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

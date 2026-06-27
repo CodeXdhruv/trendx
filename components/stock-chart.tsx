@@ -26,8 +26,8 @@ export function StockChart({ ticker, currentPrice, change, changePercent, volume
     setLoading(true);
     const tf = timeframes[activeTimeframe];
     const period1 = new Date(Date.now() - tf.days * 24 * 60 * 60 * 1000).toISOString();
-    
-    fetch(`http://localhost:3001/api/v1/company/${ticker}/chart?interval=${tf.interval}&period1=${period1}`)
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3001/api/v1';
+    fetch(`${BACKEND_URL}/company/${ticker}/chart?interval=${tf.interval}&period1=${period1}`)
       .then(res => res.json())
       .then(res => {
         if (res.success && res.data && res.data.quotes) {
