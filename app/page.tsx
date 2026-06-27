@@ -3,9 +3,8 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useApi } from "@/hooks/useApi";
 import { Search, ChevronRight, Activity, Zap, TrendingUp, ShieldCheck, Sparkles } from "lucide-react";
-import { Input } from "@/components/ui";
-import { Button } from "@/components/ui";
-import { Badge } from "@/components/ui";
+import { Input, Button, Badge } from "@/components/ui";
+import { TickerAutocomplete } from "@/components/ticker-autocomplete";
 import { motion } from "framer-motion";
 import { AnimatedResearchCard } from "@/components/AnimatedResearchCard";
 import { MiniMarketChart } from "@/components/mini-market-chart";
@@ -20,8 +19,32 @@ export default function Home() {
   const { getTrendingStocks, getDashboardData, getMarketMood } = useApi();
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [moodData, setMoodData] = useState<any>(null);
+  const [isMarketOpen, setIsMarketOpen] = useState(true);
 
   useEffect(() => {
+    const checkMarketStatus = () => {
+      const now = new Date();
+      const formatter = new Intl.DateTimeFormat('en-US', {
+        timeZone: 'America/New_York',
+        weekday: 'short',
+        hour: 'numeric',
+        minute: 'numeric',
+        hour12: false
+      });
+      const parts = formatter.formatToParts(now);
+      const day = parts.find(p => p.type === 'weekday')?.value;
+      const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
+      const minute = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
+      
+      const timeInMinutes = hour * 60 + minute;
+      const isOpenTime = timeInMinutes >= (9 * 60 + 30) && timeInMinutes < (16 * 60);
+      const isWeekend = day === 'Sat' || day === 'Sun';
+      
+      setIsMarketOpen(!isWeekend && isOpenTime);
+    };
+    checkMarketStatus();
+    const interval = setInterval(checkMarketStatus, 60000);
+    
     getTrendingStocks()
       .then((res) => {
         if (res?.data?.trending && res.data.trending.length > 0) {
@@ -77,17 +100,17 @@ export default function Home() {
           </p>
 
           <form onSubmit={handleSearch} className="flex w-full max-w-md items-center mt-4 relative mx-auto lg:mx-0">
-            <Search className="absolute left-4 w-5 h-5 text-muted-foreground pointer-events-none" />
-            <Input 
-              type="text" 
-              placeholder="Search any company or ticker..." 
+            <TickerAutocomplete
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-12 pr-14 h-14 rounded-xl border-border bg-card shadow-sm text-base w-full focus-visible:ring-1 focus-visible:ring-primary"
-            />
-            <Button type="submit" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg flex items-center justify-center transition-all">
-              <ChevronRight className="w-5 h-5" />
-            </Button>
+              onChange={(val: string) => setSearchQuery(val)}
+              placeholder="Search any company or ticker..."
+              className="w-full"
+              errorClass="h-14 pr-14 rounded-xl border-border bg-card shadow-sm text-base w-full focus-visible:ring-1 focus-visible:ring-primary"
+            >
+              <Button type="submit" size="icon" className="absolute right-2 top-1/2 -translate-y-1/2 h-10 w-10 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg flex items-center justify-center transition-all z-20">
+                <ChevronRight className="w-5 h-5" />
+              </Button>
+            </TickerAutocomplete>
           </form>
 
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-3 mt-4">
@@ -142,8 +165,15 @@ export default function Home() {
 
       {/* Live Market Pulse Section */}
       <div className="mt-32 lg:mt-[25vh]">
-        <h3 className="text-xl font-bold text-foreground">Live Market Pulse</h3>
-        <p className="text-sm text-muted-foreground mb-6">Markets update in real-time</p>
+        <h3 className="text-xl font-bold text-foreground mb-1">Live Market Pulse</h3>
+        <div className="flex items-center gap-3 mb-6">
+          <p className="text-sm text-muted-foreground">Markets update in real-time</p>
+          {!isMarketOpen && (
+            <Badge variant="outline" className="text-[10px] font-semibold bg-yellow-500/10 text-yellow-600 border-yellow-500/30 uppercase tracking-wider px-2 py-0">
+              Market Closed
+            </Badge>
+          )}
+        </div>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {[
@@ -168,7 +198,9 @@ export default function Home() {
             <div key={idx} className="w-full bg-card border border-border rounded-xl p-5 flex flex-col justify-between">
               <div className="flex justify-between items-center mb-3">
                 <div className="text-xs font-semibold text-muted-foreground">{item.id}</div>
-                <div className="text-[10px] text-muted-foreground bg-muted/30 px-2 py-0.5 rounded-sm border border-border/50">Live</div>
+                <div className={`text-[10px] px-2 py-0.5 rounded-sm border ${isMarketOpen ? 'text-success bg-success/10 border-success/20' : 'text-muted-foreground bg-muted/30 border-border/50'}`}>
+                  {isMarketOpen ? 'Live' : 'Closed'}
+                </div>
               </div>
               {item.data ? (
                 <>
@@ -224,51 +256,7 @@ export default function Home() {
       </div>
 
 
-      {/* Feature Strip */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.5, delay: 0.4 }}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-24 pt-12 border-t border-border"
-      >
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-primary/10 rounded-xl text-primary">
-            <Zap className="w-6 h-6" />
-          </div>
-          <div>
-            <h4 className="font-semibold mb-1">Multi-Agent Analysis</h4>
-            <p className="text-sm text-muted-foreground">AI agents working for you</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-primary/10 rounded-xl text-primary">
-            <Activity className="w-6 h-6" />
-          </div>
-          <div>
-            <h4 className="font-semibold mb-1">Real-time Data</h4>
-            <p className="text-sm text-muted-foreground">Live market & news scanning</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-primary/10 rounded-xl text-primary">
-            <TrendingUp className="w-6 h-6" />
-          </div>
-          <div>
-            <h4 className="font-semibold mb-1">Actionable Insights</h4>
-            <p className="text-sm text-muted-foreground">Clear takeaways in plain English</p>
-          </div>
-        </div>
-        <div className="flex items-start gap-4">
-          <div className="p-3 bg-primary/10 rounded-xl text-primary">
-            <ShieldCheck className="w-6 h-6" />
-          </div>
-          <div>
-            <h4 className="font-semibold mb-1">Proven Accuracy</h4>
-            <p className="text-sm text-muted-foreground">Backtested models you can trust</p>
-          </div>
-        </div>
-      </motion.div>
+
     </div>
   );
 }
