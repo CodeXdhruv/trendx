@@ -8,6 +8,7 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "rec
 import { FinancialSnapshot as TFinancialSnapshot } from "@/lib/mock-data";
 import { Skeleton } from "@/components/ui";
 import { useApi } from "@/hooks/useApi";
+import { getTickerIconUrl } from "@/lib/utils";
 
 
 export function FinancialSnapshot({ data }: { data: TFinancialSnapshot }) {
@@ -250,9 +251,9 @@ export function WatchlistPanel() {
 
   useEffect(() => {
     getWatchlist()
-      .then((data) => {
-        // Handle if data is array or wrapped in an object
-        setWatchlist(Array.isArray(data) ? data : data.watchlist || []);
+      .then((res) => {
+        const list = res.data?.watchlist || res.watchlist || (Array.isArray(res) ? res : []);
+        setWatchlist(list.slice(0, 5)); // Shorten the format as requested
       })
       .catch((err) => console.error("Failed to load watchlist", err))
       .finally(() => setLoading(false));
@@ -274,16 +275,17 @@ export function WatchlistPanel() {
           <div className="text-sm text-muted-foreground text-center py-4">No stocks in watchlist</div>
         ) : (
           watchlist.map((item) => {
-            const isPositive = item.changePercent >= 0 || item.trend === 'up';
+            const pct = item.today ?? item.changePercent ?? 0;
+            const isPositive = pct >= 0 || item.trend === 'up';
             return (
               <div key={item.ticker} className="flex items-center justify-between group cursor-pointer">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded bg-foreground flex items-center justify-center">
-                    <span className="text-background text-[10px] font-bold">{item.ticker?.substring(0, 1)}</span>
+                  <div className="w-8 h-8 rounded bg-card border border-border shadow-sm flex items-center justify-center overflow-hidden">
+                    <img src={getTickerIconUrl(item.ticker)} alt={`${item.ticker} logo`} className="w-6 h-6 object-contain bg-white rounded-sm" onError={(e) => { e.currentTarget.style.display = 'none'; e.currentTarget.parentElement!.innerHTML = `<span class="text-xs font-bold">${item.ticker.substring(0, 1)}</span>`; }} />
                   </div>
                   <div>
                     <div className="font-semibold text-sm group-hover:text-primary transition-colors">{item.ticker}</div>
-                    <div className="text-xs text-muted-foreground">{item.name || "Company"}</div>
+                    <div className="text-xs text-muted-foreground truncate w-24">{item.name || "Company"}</div>
                   </div>
                 </div>
                 
@@ -301,7 +303,7 @@ export function WatchlistPanel() {
                   <div className="text-right">
                     <div className="font-mono text-sm font-semibold">${Number(item.price || 0).toFixed(2)}</div>
                     <div className={`text-xs ${isPositive ? 'text-success' : 'text-danger'}`}>
-                      {isPositive ? '+' : ''}{Number(item.changePercent || 0).toFixed(2)}%
+                      {isPositive ? '+' : ''}{Number(pct).toFixed(2)}%
                     </div>
                   </div>
                 </div>

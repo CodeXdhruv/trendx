@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { TrendingUp, TrendingDown } from "lucide-react";
-
+import { Badge } from "@/components/ui";
 type Timeframe = "1D" | "5D" | "1M" | "3M" | "6M" | "1Y" | "2Y" | "5Y";
 
 const timeframes: Record<Timeframe, { interval: string; days: number }> = {
@@ -69,6 +69,7 @@ export function StockChart({ ticker, currentPrice, change, changePercent, volume
         <div>
            <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 text-foreground">
              {ticker} <span className="font-mono text-xs font-normal text-muted-foreground normal-case">Live Market Tracker</span>
+             {[0, 6].includes(new Date().getDay()) && <Badge variant="secondary" className="text-[10px] bg-muted-foreground/20">Market Closed</Badge>}
            </h2>
            <div className="flex items-center gap-3 mt-1">
              <span className="text-4xl font-bold font-mono text-foreground">${currentPrice.toFixed(2)}</span>
