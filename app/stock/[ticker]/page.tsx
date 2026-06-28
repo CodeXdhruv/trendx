@@ -205,15 +205,15 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div className="flex items-center gap-4">
-            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-card border border-border shadow-sm">
+            <div className="flex items-center justify-center w-12 h-12 rounded-xl bg-card border border-border shadow-sm shrink-0">
               <img src={getTickerIconUrl(ticker)} alt={`${ticker} logo`} className="w-10 h-10 rounded-lg bg-white" onError={(e) => (e.currentTarget.style.display = 'none')} />
             </div>
-            <div className="flex flex-col justify-center">
+            <div className="flex flex-col justify-center pt-1.5">
               <div className="flex items-baseline gap-2.5">
-                <h1 className="text-2xl font-bold tracking-tight">{data.name}</h1>
+                <h1 className="text-2xl font-bold tracking-tight text-foreground">{data.name}</h1>
                 <span className="text-lg font-semibold text-muted-foreground">{ticker}</span>
               </div>
-              <div className="flex items-center gap-2 mt-1">
+              <div className="flex items-center gap-2 mt-0.5">
                 <span className="text-xs font-medium text-muted-foreground">{data.exchange || 'NYSE'}</span>
                 <span className="text-xs text-muted-foreground/50">•</span>
                 <Badge variant="secondary" className="font-medium text-[10px] px-2 py-0 h-4 bg-muted/50">{data.industry || 'Technology'}</Badge>
@@ -235,7 +235,7 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
         <div className="flex-1 space-y-8">
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="w-full justify-start border-b border-border rounded-none bg-transparent h-auto p-0 space-x-6 overflow-x-auto overflow-y-hidden [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-              {['Overview', 'Financials', 'News & Sentiment', 'Valuation', 'Risks', 'Outlook', 'AI Debate'].map((tab) => (
+              {['Overview', 'Financials', 'News & Sentiment', 'Valuation', 'Risks', 'AI Debate'].map((tab) => (
                 <TabsTrigger 
                   key={tab} 
                   value={tab.toLowerCase()}
@@ -355,50 +355,62 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
                        </div>
                     )}
                   </div>
-                  <button 
-                    onClick={() => setIsChatOpen(true)}
-                    className="flex items-center gap-2 bg-foreground text-background px-4 py-2.5 rounded-lg w-fit hover:bg-foreground/90 transition-colors text-sm font-medium"
-                  >
-                    <Sparkles className="w-4 h-4 text-primary" />
-                    Ask AI Analyst
-                  </button>
                 </div>
 
                 <div className="bg-card p-6 rounded-2xl border border-border shadow-sm">
                   <h3 className="font-semibold mb-6">Score Breakdown</h3>
-                  <div className="flex items-center gap-8">
-                    <div className="w-32 h-32 relative flex items-center justify-center">
-                      <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--muted)" strokeWidth="12" />
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--primary)" strokeWidth="12" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - (data.aiScore/100))} className="transition-all duration-1000" />
-                        <circle cx="50" cy="50" r="40" fill="none" stroke="var(--foreground)" strokeWidth="12" strokeDasharray="50 200" className="opacity-20" />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                         <span className="text-3xl font-bold font-mono">{data.aiScore}</span>
-                         <span className="text-xs text-muted-foreground">/100</span>
-                      </div>
-                    </div>
-                    <div className="flex-1 space-y-3">
-                      {[
-                        { label: 'Fundamentals', score: data.scoreBreakdown?.fundamentals?.score || 0, max: 30, color: 'bg-primary', tooltip: 'Evaluates revenue growth, profit margin, ROE, debt ratio, and free cash flow.' },
-                        { label: 'News & Sentiment', score: data.scoreBreakdown?.newsSentiment?.score || 0, max: 20, color: 'bg-muted-foreground', tooltip: 'Measures recent media coverage, social media trends, and public perception.' },
-                        { label: 'Industry Outlook', score: data.scoreBreakdown?.industryOutlook?.score || 0, max: 20, color: 'bg-muted-foreground', tooltip: 'Assesses macro sector trends, competitive positioning, and market expansion.' },
-                        { label: 'Valuation', score: data.scoreBreakdown?.valuation?.score || 0, max: 20, color: 'bg-muted-foreground', tooltip: 'Analyzes intrinsic fair value, P/E multiples, and DCF growth models.' },
-                        { label: 'Risk Assessment', score: data.scoreBreakdown?.riskAssessment?.score || 0, max: 10, color: 'bg-foreground', tooltip: 'Identifies macroeconomic sensitivity, supply chain, and regulatory risks.' },
-                      ].map((item) => (
-                        <div key={item.label} className="group relative flex justify-between items-center text-sm cursor-help">
-                          <div className="flex items-center gap-2">
-                            <div className={`w-2 h-2 rounded-full ${item.color}`} />
-                            <span className="text-muted-foreground group-hover:text-foreground transition-colors border-b border-dashed border-muted-foreground/30">{item.label}</span>
-                          </div>
-                          <span className="font-mono font-medium">{item.score}/{item.max}</span>
-                          <div className="absolute right-0 bottom-full mb-2 w-48 p-2 bg-foreground text-background text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                            {item.tooltip}
+                  {(() => {
+                    const fR = safeParse(data.agentOutputs?.finance)?.score || 0;
+                    const nR = safeParse(data.agentOutputs?.news)?.score || 0;
+                    const iR = safeParse(data.agentOutputs?.industry)?.score || 0;
+                    const vR = safeParse(data.agentOutputs?.valuation)?.score || 0;
+                    const rR = safeParse(data.agentOutputs?.risk)?.score || 100; // default 100 risk is worst
+                    
+                    const f = Math.round(fR * 0.3);
+                    const n = Math.round(nR * 0.2);
+                    const ind = Math.round(iR * 0.2);
+                    const v = Math.round(vR * 0.2);
+                    const r = Math.round((100 - rR) * 0.1);
+                    
+                    const total = f + n + ind + v + r;
+                    const displayTotal = total > 0 ? total : (data.aiScore || 0); // fallback if agents haven't loaded
+
+                    return (
+                      <div className="flex items-center gap-8">
+                        <div className="w-32 h-32 relative flex items-center justify-center shrink-0">
+                          <svg className="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--muted)" strokeWidth="12" />
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--primary)" strokeWidth="12" strokeDasharray="251.2" strokeDashoffset={251.2 * (1 - (displayTotal/100))} className="transition-all duration-1000" />
+                            <circle cx="50" cy="50" r="40" fill="none" stroke="var(--foreground)" strokeWidth="12" strokeDasharray="50 200" className="opacity-20" />
+                          </svg>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center">
+                             <span className="text-3xl font-bold font-mono">{displayTotal}</span>
+                             <span className="text-xs text-muted-foreground">/100</span>
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  </div>
+                        <div className="flex-1 space-y-3">
+                          {[
+                            { label: 'Fundamentals', score: f, max: 30, color: 'bg-primary', tooltip: 'Evaluates revenue growth, profit margin, ROE, debt ratio, and free cash flow.' },
+                            { label: 'News & Sentiment', score: n, max: 20, color: 'bg-muted-foreground', tooltip: 'Measures recent media coverage, social media trends, and public perception.' },
+                            { label: 'Industry Outlook', score: ind, max: 20, color: 'bg-muted-foreground', tooltip: 'Assesses macro sector trends, competitive positioning, and market expansion.' },
+                            { label: 'Valuation', score: v, max: 20, color: 'bg-muted-foreground', tooltip: 'Analyzes intrinsic fair value, P/E multiples, and DCF growth models.' },
+                            { label: 'Risk Assessment', score: r, max: 10, color: 'bg-foreground', tooltip: 'Identifies macroeconomic sensitivity, supply chain, and regulatory risks (Inverted: lower risk yields higher score).' },
+                          ].map((item) => (
+                            <div key={item.label} className="group relative flex justify-between items-center text-sm cursor-help">
+                              <div className="flex items-center gap-2">
+                                <div className={`w-2 h-2 rounded-full ${item.color}`} />
+                                <span className="text-muted-foreground group-hover:text-foreground transition-colors border-b border-dashed border-muted-foreground/30">{item.label}</span>
+                              </div>
+                              <span className="font-mono font-medium">{item.score}/{item.max}</span>
+                              <div className="absolute right-0 bottom-full mb-2 w-48 p-2 bg-foreground text-background text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                                {item.tooltip}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 
@@ -667,70 +679,14 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
                </div>
             </TabsContent>
             
-            <TabsContent value="outlook" className="mt-8 space-y-8">
-               <div className="bg-card p-6 rounded-2xl border border-border shadow-sm">
-                 <h3 className="font-semibold mb-6">Industry Outlook & Analyst Consensus</h3>
-                 
-                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div className="md:col-span-2 space-y-4">
-                      {data.agentOutputs?.industry ? (
-                        (() => {
-                          const ind = safeParse(data.agentOutputs.industry);
-                          if (!ind) return null;
-                          return (
-                             <>
-                                <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground">Sector Analysis ({data.industry})</h4>
-                                <div className="text-sm leading-relaxed p-4 bg-muted/30 rounded-xl border border-border">
-                                  {ind.summary || "Strong secular tailwinds expected in the coming quarters."}
-                                </div>
-                                <div className="flex gap-4 text-xs">
-                                  <div className="px-3 py-1 bg-success/10 text-success rounded-full border border-success/20">Growth: Positive</div>
-                                  <div className="px-3 py-1 bg-primary/10 text-primary rounded-full border border-primary/20">Competition: Medium</div>
-                                </div>
-                             </>
-                          )
-                        })()
-                      ) : (
-                         <div className="text-sm text-muted-foreground animate-pulse">Analyzing sector dynamics...</div>
-                      )}
-                    </div>
-                    
-                    <div className="border border-border rounded-xl p-4 flex flex-col justify-center items-center bg-muted/10">
-                       <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-4">Wall St Consensus</h4>
-                       <div className="text-2xl font-bold text-primary mb-4">{data.aiRecommendation}</div>
-                       <div className="w-full space-y-2">
-                         <div className="flex items-center justify-between text-xs"><span>Buy</span><span className="font-mono text-success">18</span></div>
-                         <div className="w-full h-1.5 bg-muted rounded overflow-hidden"><div className="w-[60%] h-full bg-success"></div></div>
-                         <div className="flex items-center justify-between text-xs mt-2"><span>Hold</span><span className="font-mono text-muted-foreground">8</span></div>
-                         <div className="w-full h-1.5 bg-muted rounded overflow-hidden"><div className="w-[30%] h-full bg-muted-foreground"></div></div>
-                         <div className="flex items-center justify-between text-xs mt-2"><span>Sell</span><span className="font-mono text-destructive">2</span></div>
-                         <div className="w-full h-1.5 bg-muted rounded overflow-hidden"><div className="w-[10%] h-full bg-destructive"></div></div>
-                       </div>
-                    </div>
-                 </div>
-
-                 <h4 className="text-sm font-bold uppercase tracking-wider text-muted-foreground mb-4">Historical Performance</h4>
-                 <div className="h-32 flex items-end gap-2">
-                   {[40, 60, 45, 80, 95, 120, 105, 130, 145, 140, 160, 180].map((h, i) => (
-                     <div key={i} className="flex-1 bg-primary/20 hover:bg-primary/40 rounded-t-sm transition-all relative group" style={{ height: `${(h/180)*100}%` }}>
-                        <div className="absolute bottom-full mb-1 left-1/2 transform -translate-x-1/2 opacity-0 group-hover:opacity-100 bg-foreground text-background text-[10px] px-1 rounded pointer-events-none">
-                          Mo {i+1}
-                        </div>
-                     </div>
-                   ))}
-                 </div>
-                 <div className="flex justify-between text-xs text-muted-foreground mt-2 uppercase tracking-wider">
-                   <span>1 Yr Ago</span><span>Today</span>
-                 </div>
-               </div>
-            </TabsContent>
+            {/* Outlook tab removed */}
             
             <TabsContent value="ai debate" className="mt-8 space-y-8">
                <div className="bg-card p-6 rounded-2xl border border-border shadow-sm">
                  <h3 className="font-semibold mb-6 flex items-center gap-2">
-                   <Sparkles className="w-5 h-5 text-primary" /> Parsed Multi-Agent Output
+                   <Sparkles className="w-5 h-5 text-primary" /> AI Debate & Committee Consensus
                  </h3>
-                 <p className="text-sm text-muted-foreground mb-6">Raw LLM JSON is intercepted and parsed into structured data for the committee consensus.</p>
+                 <p className="text-sm text-muted-foreground mb-6">Transparent view into the autonomous multi-agent committee. Each specialized AI agent evaluates the asset independently before synthesizing a final consensus recommendation.</p>
                  
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                    {['finance', 'valuation', 'risk', 'news', 'industry'].map((agentName) => {
@@ -743,29 +699,45 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
                        </div>
                      );
                      
+                     const formatValue = (v: any) => {
+                       if (typeof v === 'number') {
+                         if (v > 1000000) return `$${(v / 1e9).toFixed(2)}B`;
+                         if (v % 1 !== 0) return v.toFixed(2);
+                         return v.toLocaleString();
+                       }
+                       if (typeof v === 'boolean') return v ? 'Yes' : 'No';
+                       return String(v);
+                     };
+
                      return (
-                       <div key={agentName} className="border border-border p-5 rounded-xl shadow-sm bg-card hover:border-primary/30 transition-colors">
-                         <div className="flex justify-between items-center mb-3 border-b border-border pb-2">
-                            <h4 className="font-bold capitalize text-primary">{agentName} Agent</h4>
-                            {parsed.score && <Badge variant="outline" className="font-mono">Score: {parsed.score}</Badge>}
+                       <div key={agentName} className="border border-border p-5 rounded-xl shadow-sm bg-card hover:border-primary/30 transition-colors flex flex-col h-full">
+                         <div className="flex justify-between items-center mb-4 border-b border-border pb-3">
+                            <h4 className="font-bold capitalize text-primary flex items-center gap-2">{agentName} Agent</h4>
+                            {parsed.score !== undefined && <Badge variant="secondary" className="font-mono bg-primary/10 text-primary">Score: {parsed.score}</Badge>}
                          </div>
-                         <div className="space-y-2">
+                         <div className="space-y-4 flex-1">
                            {Object.entries(parsed).map(([key, val]) => {
                              if (key === 'score') return null;
                              return (
-                               <div key={key} className="text-sm">
-                                 <span className="font-semibold text-muted-foreground capitalize mr-2">{key.replace(/([A-Z])/g, ' $1').trim()}:</span>
-                                 <div className="font-medium inline-block align-top">
-                                   {Array.isArray(val) ? val.join(', ') : (val !== null && typeof val === 'object') ? (
-                                     <div className="mt-1 space-y-1 pl-3 border-l-2 border-primary/20">
+                               <div key={key} className="text-sm flex flex-col gap-1.5">
+                                 <span className="font-bold text-xs uppercase tracking-wider text-muted-foreground">{key.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                 <div className="font-medium bg-muted/20 p-3 rounded-lg border border-border/50">
+                                   {Array.isArray(val) ? (
+                                     <ul className="list-disc pl-4 space-y-1.5 text-xs text-foreground/80">
+                                       {val.map((item, i) => <li key={i}>{String(item)}</li>)}
+                                     </ul>
+                                   ) : (val !== null && typeof val === 'object') ? (
+                                     <div className="grid grid-cols-2 gap-3 text-xs">
                                        {Object.entries(val).map(([subKey, subVal]) => (
-                                         <div key={subKey} className="text-xs">
-                                           <span className="text-muted-foreground capitalize">{subKey.replace(/([A-Z])/g, ' $1').trim()}: </span>
-                                           <span>{String(subVal)}</span>
+                                         <div key={subKey} className="flex flex-col">
+                                           <span className="text-muted-foreground/80 capitalize text-[10px] uppercase tracking-wider">{subKey.replace(/([A-Z])/g, ' $1').trim()}</span>
+                                           <span className="font-mono font-bold mt-0.5">{formatValue(subVal)}</span>
                                          </div>
                                        ))}
                                      </div>
-                                   ) : String(val)}
+                                   ) : (
+                                     <span className="text-sm text-foreground/90">{formatValue(val)}</span>
+                                   )}
                                  </div>
                                </div>
                              )
@@ -783,7 +755,6 @@ export default function StockDetailPage({ params }: { params: Promise<{ ticker: 
 
         {/* Right Sidebar */}
         <div className="w-full xl:w-80 space-y-6">
-          <MarketMood />
           <WatchlistPanel />
         </div>
       </div>
