@@ -9,7 +9,7 @@ import { Search, Sun, Moon, Bell, Command } from 'lucide-react';
 import { ThemeProvider as NextThemesProvider, type ThemeProviderProps } from "next-themes";
 import { UserButton, SignInButton, SignUpButton, useAuth } from '@clerk/nextjs';
 import { motion, AnimatePresence } from 'framer-motion';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { useTheme } from 'next-themes';
 import { Menu, X, ArrowUpRight, ArrowDownRight, Activity, AlertCircle } from 'lucide-react';
@@ -19,6 +19,7 @@ import { useApi } from '@/hooks/useApi';
 
 export function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const { theme, setTheme } = useTheme();
   const { isLoaded, userId } = useAuth();
   const [mounted, setMounted] = useState(false);
@@ -222,7 +223,7 @@ export function Navbar() {
             onSubmit={(e) => {
               e.preventDefault();
               if (searchQuery) {
-                window.location.href = `/stock/${searchQuery.trim().toUpperCase()}`;
+                router.push(`/stock/${searchQuery.trim().toUpperCase()}`);
               }
             }}
             className="relative hidden lg:flex items-center"
@@ -231,6 +232,7 @@ export function Navbar() {
               inputRef={searchInputRef}
               value={searchQuery}
               onChange={(val: string) => setSearchQuery(val)}
+              onSelect={(val: string) => router.push(`/stock/${val}`)}
               placeholder="Search company or ticker..."
               className="w-[280px]"
               errorClass="pl-9 bg-muted/50 border-none focus-visible:ring-1 focus-visible:ring-primary rounded-lg h-9"
@@ -363,7 +365,8 @@ export function Navbar() {
                   const formData = new FormData(e.currentTarget);
                   const query = formData.get('search');
                   if (query) {
-                    window.location.href = `/stock/${query.toString().trim().toUpperCase()}`;
+                    router.push(`/stock/${query.toString().trim().toUpperCase()}`);
+                    setIsMobileMenuOpen(false);
                   }
                 }}
                 className="relative flex items-center w-full mb-2"

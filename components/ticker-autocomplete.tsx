@@ -3,7 +3,7 @@ import { Input } from "@/components/ui";
 import { Search } from "lucide-react";
 import { getTickerIconUrl } from "@/lib/utils";
 
-export function TickerAutocomplete({ value, onChange, placeholder, className, autoFocus, disabled, errorClass, inputRef, children }: any) {
+export function TickerAutocomplete({ value, onChange, onSelect, placeholder, className, autoFocus, disabled, errorClass, inputRef, children }: any) {
   const [query, setQuery] = useState(value || '');
   const [results, setResults] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
@@ -58,6 +58,7 @@ export function TickerAutocomplete({ value, onChange, placeholder, className, au
     onChange(ticker);
     setQuery(ticker);
     setIsOpen(false);
+    if (onSelect) onSelect(ticker);
   };
 
   return (
