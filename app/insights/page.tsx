@@ -93,15 +93,7 @@ function Header({ onRefresh, isFetching }: { onRefresh: () => void, isFetching: 
         <h1 className="text-3xl font-bold tracking-tight mb-1">Market Intelligence</h1>
         <p className="text-muted-foreground">Real-time market insights and sector performance</p>
       </div>
-      <div className="flex items-center gap-3">
-        <div className="relative w-full md:w-64">
-          <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground" />
-          <Input placeholder="Search markets..." className="pl-9 rounded-full bg-background border-border" />
-        </div>
-        <Button variant="outline" size="icon" onClick={onRefresh} disabled={isFetching} className="rounded-full shadow-sm">
-          <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
-        </Button>
-      </div>
+
     </div>
   );
 }
@@ -177,9 +169,9 @@ function MarketPulse({ data }: { data: any }) {
 }
 
 function TopSectors({ data }: { data: any }) {
-  if (!data || data.length === 0) return <EmptyState />;
+  if (!data || data.length === 0) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="Top Sectors" icon={PieChartIcon} />
       </CardHeader>
@@ -204,9 +196,9 @@ function TopSectors({ data }: { data: any }) {
 }
 
 function SectorHeatmap({ data }: { data: any }) {
-  if (!data || data.length === 0) return <EmptyState />;
+  if (!data || data.length === 0) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="Sector Heatmap" icon={GridIcon} />
       </CardHeader>
@@ -236,14 +228,14 @@ function SectorHeatmap({ data }: { data: any }) {
 }
 
 function MarketNews({ data }: { data: any }) {
-  if (!data || data.length === 0) return <EmptyState />;
+  if (!data || data.length === 0) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="Market News" icon={Newspaper} />
       </CardHeader>
       <CardContent>
-        <ScrollArea className="h-[400px] pr-4">
+        <ScrollArea className="h-[600px] pr-4">
           <div className="space-y-4">
             {data.map((news: any, i: number) => (
               <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }} className="group relative flex flex-col gap-1 pb-4 border-b border-border/40 last:border-0 hover:bg-muted/30 p-2 rounded-lg transition-colors">
@@ -265,9 +257,9 @@ function MarketNews({ data }: { data: any }) {
 }
 
 function TopMovers({ data }: { data: any }) {
-  if (!data) return <EmptyState />;
+  if (!data) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="Top Movers" icon={Activity} />
       </CardHeader>
@@ -312,9 +304,9 @@ function TopMovers({ data }: { data: any }) {
 }
 
 function TrendingStocks({ data }: { data: any }) {
-  if (!data || data.length === 0) return <EmptyState />;
+  if (!data || data.length === 0) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="Trending Stocks" icon={Flame} />
       </CardHeader>
@@ -334,9 +326,9 @@ function TrendingStocks({ data }: { data: any }) {
 }
 
 function SocialBuzz({ data }: { data: any }) {
-  if (!data || data.length === 0) return <EmptyState />;
+  if (!data || data.length === 0) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="Social Buzz" icon={Globe} />
       </CardHeader>
@@ -366,9 +358,9 @@ function SocialBuzz({ data }: { data: any }) {
 }
 
 function UpcomingEarnings({ data }: { data: any }) {
-  if (!data || data.length === 0) return <EmptyState />;
+  if (!data || data.length === 0) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="Upcoming Earnings" icon={Calendar} />
       </CardHeader>
@@ -412,9 +404,9 @@ function UpcomingEarnings({ data }: { data: any }) {
 }
 
 function ETFPerformance({ data }: { data: any }) {
-  if (!data || data.length === 0) return <EmptyState />;
+  if (!data || data.length === 0) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="ETF Performance" icon={Landmark} />
       </CardHeader>
@@ -452,9 +444,9 @@ function ETFPerformance({ data }: { data: any }) {
 }
 
 function IPOCalendar({ data }: { data: any }) {
-  if (!data || data.length === 0) return <EmptyState />;
+  if (!data || data.length === 0) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="IPO Calendar" icon={Building2} />
       </CardHeader>
@@ -479,9 +471,9 @@ function IPOCalendar({ data }: { data: any }) {
 }
 
 function EconomicCalendar({ data }: { data: any }) {
-  if (!data || data.length === 0) return <EmptyState />;
+  if (!data || data.length === 0) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="Economic Calendar" icon={Globe} />
       </CardHeader>
@@ -509,9 +501,9 @@ function EconomicCalendar({ data }: { data: any }) {
 }
 
 function MarketStatistics({ data }: { data: any }) {
-  if (!data) return <EmptyState />;
+  if (!data) return null;
   return (
-    <Card className="h-full shadow-sm border-border/50">
+    <Card className="shadow-sm border-border/50">
       <CardHeader className="pb-2">
         <SectionHeader title="Market Statistics" icon={BarChart3} />
       </CardHeader>
@@ -628,35 +620,23 @@ function InsightsDashboard() {
 
               {/* Grid Layout */}
               <AuthGate message="Sign in to access deep market analysis, sentiment tracking, and predictive sector heatmaps.">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                  <div className="flex flex-col gap-6">
-                    <MarketNews data={data?.marketNews} />
-                    <SocialBuzz data={data?.socialBuzz} />
-                  </div>
+                <div className="columns-1 md:columns-2 xl:columns-3 gap-6 space-y-6 pb-8">
+                  {data?.marketNews?.length > 0 && <div className="break-inside-avoid"><MarketNews data={data?.marketNews} /></div>}
+                  {data?.socialBuzz?.length > 0 && <div className="break-inside-avoid"><SocialBuzz data={data?.socialBuzz} /></div>}
                   
-                  <div className="flex flex-col gap-6">
-                    <TopSectors data={data?.topSectors} />
-                    <SectorHeatmap data={data?.sectorHeatmap} />
-                    <TrendingStocks data={data?.trendingStocks} />
-                  </div>
+                  {data?.topSectors?.length > 0 && <div className="break-inside-avoid"><TopSectors data={data?.topSectors} /></div>}
+                  {data?.sectorHeatmap?.length > 0 && <div className="break-inside-avoid"><SectorHeatmap data={data?.sectorHeatmap} /></div>}
+                  {data?.trendingStocks?.length > 0 && <div className="break-inside-avoid"><TrendingStocks data={data?.trendingStocks} /></div>}
                   
-                  <div className="flex flex-col gap-6">
-                    <TopMovers data={data?.topMovers} />
-                    <MarketStatistics data={data?.marketStatistics} />
-                  </div>
+                  {data?.topMovers && <div className="break-inside-avoid"><TopMovers data={data?.topMovers} /></div>}
+                  {data?.marketStatistics && <div className="break-inside-avoid"><MarketStatistics data={data?.marketStatistics} /></div>}
 
-                  <div className="flex flex-col gap-6 xl:col-span-1">
-                    <ETFPerformance data={data?.etfPerformance} />
-                  </div>
+                  {data?.etfPerformance?.length > 0 && <div className="break-inside-avoid"><ETFPerformance data={data?.etfPerformance} /></div>}
 
-                  <div className="flex flex-col gap-6 xl:col-span-1">
-                    <UpcomingEarnings data={data?.upcomingEarnings} />
-                  </div>
+                  {data?.upcomingEarnings?.length > 0 && <div className="break-inside-avoid"><UpcomingEarnings data={data?.upcomingEarnings} /></div>}
 
-                  <div className="flex flex-col gap-6 xl:col-span-1">
-                    <EconomicCalendar data={data?.economicCalendar} />
-                    <IPOCalendar data={data?.ipoCalendar} />
-                  </div>
+                  {data?.economicCalendar?.length > 0 && <div className="break-inside-avoid"><EconomicCalendar data={data?.economicCalendar} /></div>}
+                  {data?.ipoCalendar?.length > 0 && <div className="break-inside-avoid"><IPOCalendar data={data?.ipoCalendar} /></div>}
                 </div>
               </AuthGate>
             </motion.div>
