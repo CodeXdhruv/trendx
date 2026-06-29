@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AreaChart, Area, ResponsiveContainer, Tooltip, YAxis } from "recharts";
+import { AreaChart, Area, ResponsiveContainer, Tooltip, YAxis, XAxis } from "recharts";
 
 export function MiniMarketChart({ ticker, color }: { ticker: string; color: string }) {
   const [data, setData] = useState<any[]>([]);
@@ -41,6 +41,7 @@ export function MiniMarketChart({ ticker, color }: { ticker: string; color: stri
             <stop offset="95%" stopColor={color} stopOpacity={0} />
           </linearGradient>
         </defs>
+        <XAxis dataKey="time" hide />
         <YAxis domain={['dataMin', 'dataMax']} hide />
         <Tooltip
           cursor={{ stroke: 'var(--muted-foreground)', strokeWidth: 1, strokeDasharray: '4 4' }}

@@ -95,6 +95,7 @@ export default function Home() {
             <TickerAutocomplete
               value={searchQuery}
               onChange={(val: string) => setSearchQuery(val)}
+              onSelect={(val: string) => router.push(`/stock/${val}`)}
               placeholder="Search any company or ticker..."
               className="w-full"
               errorClass="h-14 pr-14 rounded-xl border-border bg-card shadow-sm text-base w-full focus-visible:ring-1 focus-visible:ring-primary"
