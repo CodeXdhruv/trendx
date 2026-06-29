@@ -24,9 +24,8 @@ export function AuthGate({ children, message = "Authentication required for data
           </p>
           <SignInButton mode="modal">
             <Button 
-              variant="outline" 
-              size="sm" 
-              className="mt-2 rounded-sm border-border/50 hover:border-foreground/50 text-muted-foreground hover:text-foreground hover:bg-background/50 backdrop-blur-sm font-mono text-[10px] uppercase tracking-widest px-8 h-8 transition-all"
+              variant="default"
+              className="mt-4 rounded-md font-medium text-sm px-8 h-10 shadow-md hover:shadow-lg transition-all"
             >
               Authenticate
             </Button>
