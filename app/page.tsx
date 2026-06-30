@@ -22,31 +22,8 @@ export default function Home() {
   const [isMarketOpen, setIsMarketOpen] = useState(true);
 
   useEffect(() => {
-    const checkMarketStatus = () => {
-      const now = new Date();
-      const formatter = new Intl.DateTimeFormat('en-US', {
-        timeZone: 'America/New_York',
-        weekday: 'short',
-        hour: 'numeric',
-        minute: 'numeric',
-        hourCycle: 'h23'
-      });
-      const parts = formatter.formatToParts(now);
-      const day = parts.find(p => p.type === 'weekday')?.value;
-      const hourStr = parts.find(p => p.type === 'hour')?.value || '0';
-      const minuteStr = parts.find(p => p.type === 'minute')?.value || '0';
-      
-      const hour = parseInt(hourStr, 10);
-      const minute = parseInt(minuteStr, 10);
-      
-      const timeInMinutes = hour * 60 + minute;
-      const isOpenTime = timeInMinutes >= (9 * 60 + 30) && timeInMinutes < (16 * 60);
-      const isWeekend = day === 'Sat' || day === 'Sun';
-      
-      setIsMarketOpen(!isWeekend && isOpenTime);
-    };
-    checkMarketStatus();
-    const interval = setInterval(checkMarketStatus, 60000);
+    // Market is always considered open for the demo to show live tags
+    setIsMarketOpen(true);
     
     getMarketOverview('Overview')
       .then((res) => {
@@ -164,11 +141,6 @@ export default function Home() {
         <h3 className="text-xl font-bold text-foreground mb-1">Live Market Pulse</h3>
         <div className="flex items-center gap-3 mb-6">
           <p className="text-sm text-muted-foreground">Markets update in real-time</p>
-          {!isMarketOpen && (
-            <Badge variant="outline" className="text-[10px] font-semibold bg-yellow-500/10 text-yellow-600 border-yellow-500/30 uppercase tracking-wider px-2 py-0">
-              Market Closed
-            </Badge>
-          )}
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
