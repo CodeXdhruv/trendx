@@ -69,7 +69,14 @@ export function StockChart({ ticker, currentPrice, change, changePercent, volume
         <div>
            <h2 className="text-xl font-black uppercase tracking-tight flex items-center gap-2 text-foreground">
              {ticker} <span className="font-mono text-xs font-normal text-muted-foreground normal-case">Live Market Tracker</span>
-             {[0, 6].includes(new Date().getDay()) && <Badge variant="secondary" className="text-[10px] bg-muted-foreground/20">Market Closed</Badge>}
+             {(() => {
+               const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/New_York', weekday: 'short', hourCycle: 'h23', hour: 'numeric', minute: 'numeric' }).formatToParts(new Date());
+               const day = parts.find(p => p.type === 'weekday')?.value;
+               const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0', 10);
+               const min = parseInt(parts.find(p => p.type === 'minute')?.value || '0', 10);
+               const t = hour * 60 + min;
+               return (day === 'Sat' || day === 'Sun' || t < 570 || t >= 960) && <Badge variant="secondary" className="text-[10px] bg-muted-foreground/20">Market Closed</Badge>;
+             })()}
            </h2>
            <div className="flex items-center gap-3 mt-1">
              <span className="text-4xl font-bold font-mono text-foreground">${currentPrice.toFixed(2)}</span>

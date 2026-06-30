@@ -29,12 +29,15 @@ export default function Home() {
         weekday: 'short',
         hour: 'numeric',
         minute: 'numeric',
-        hour12: false
+        hourCycle: 'h23'
       });
       const parts = formatter.formatToParts(now);
       const day = parts.find(p => p.type === 'weekday')?.value;
-      const hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
-      const minute = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
+      const hourStr = parts.find(p => p.type === 'hour')?.value || '0';
+      const minuteStr = parts.find(p => p.type === 'minute')?.value || '0';
+      
+      const hour = parseInt(hourStr, 10);
+      const minute = parseInt(minuteStr, 10);
       
       const timeInMinutes = hour * 60 + minute;
       const isOpenTime = timeInMinutes >= (9 * 60 + 30) && timeInMinutes < (16 * 60);
